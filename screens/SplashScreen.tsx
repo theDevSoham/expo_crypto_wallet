@@ -14,7 +14,10 @@ const SplashScreen: React.FC = () => {
     }).start();
 
     setTimeout(() => {
-      navigation.navigate('Dashboard');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Dashboard' }],
+      })
     }, 3000);
   }, [fadeAnim]);
 

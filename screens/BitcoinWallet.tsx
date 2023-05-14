@@ -5,22 +5,51 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import BottomTab from "../components/BottomTab";
 import { useNavigation } from "@react-navigation/native";
+import { observer } from 'mobx-react-lite';
+import btcStore from "../stores/btcStore";
+import { getBitcoinWalletInfo } from "../helpers/Wallet";
+import Loader from "../components/Loader";
+
+const divider = 100000000; // 1 BTC = 100000000 Satoshi
 
 const BitcoinWalletScreen: React.FC = () => {
-  const [connected, setConnected] = useState(false); // Whether a wallet is connected or not
-  const [balance, setBalance] = useState(0); // The available bitcoins in the wallet
-  const [address, setAddress] = useState(""); // The bitcoin wallet address
+
+  const [address, setAddress] = useState<string>(""); // The bitcoin wallet address
+  const [loader, setLoader] = useState<boolean>(false); // The loader state
+  const [connected, setConnected] = useState<boolean>(false); // The connected state
 
   const navigation = useNavigation();
 
   const connectWallet = () => {
     // Implement your wallet connection logic here
-    setConnected(true);
-    setBalance(0.12345); // Example balance value
+	if(address.length === 0){
+		Alert.alert("Error", "Address cannot be empty");
+		return;
+	}
+	setLoader(true);
+	getBitcoinWalletInfo(address)
+	.then((walletInfo) => {
+		setLoader(false);
+		console.log(walletInfo);
+		btcStore.getAddress(walletInfo.address);
+		btcStore.getBalance((walletInfo.balance/ divider).toString());
+		btcStore.setConnected(true);
+		setConnected(true);
+	})
+	.catch((error) => {
+		setLoader(false);
+		Alert.alert("Error", "Invalid Address");
+		console.log(error);
+	});
   };
+
+  React.useEffect(() => {
+	setConnected(btcStore.connected);
+  }, [btcStore.connected]);
 
   return (
     <View style={styles.container}>
@@ -37,9 +66,9 @@ const BitcoinWalletScreen: React.FC = () => {
         {connected ? (
           <>
             <Text style={styles.addressLabel}>Connected to:</Text>
-            <Text style={styles.addressValue}>{address}</Text>
+            <Text style={styles.addressValue}>{btcStore.btcAddress}</Text>
             <Text style={styles.balanceLabel}>Available Bitcoins</Text>
-            <Text style={styles.balanceValue}>{balance} BTC</Text>
+            <Text style={styles.balanceValue}>{btcStore.btcBalance} BTC</Text>
           </>
         ) : (
           <>
@@ -63,6 +92,7 @@ const BitcoinWalletScreen: React.FC = () => {
       <View style={styles.footer}>
         <BottomTab />
       </View>
+	  {loader ? <Loader /> : null}
     </View>
   );
 };
@@ -148,4 +178,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BitcoinWalletScreen;
+export default observer(BitcoinWalletScreen);

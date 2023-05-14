@@ -1,8 +1,10 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useRef } from 'react';
 import { View, Image, StyleSheet, Animated } from 'react-native';
 
 const SplashScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation();
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -10,6 +12,10 @@ const SplashScreen: React.FC = () => {
       duration: 2000,
       useNativeDriver: true,
     }).start();
+
+    setTimeout(() => {
+      navigation.navigate('Dashboard');
+    }, 3000);
   }, [fadeAnim]);
 
   return (

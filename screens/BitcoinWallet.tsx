@@ -25,7 +25,6 @@ const BitcoinWalletScreen: React.FC = () => {
   const navigation = useNavigation();
 
   const connectWallet = () => {
-    // Implement your wallet connection logic here
 	if(address.length === 0){
 		Alert.alert("Error", "Address cannot be empty");
 		return;

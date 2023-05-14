@@ -9,6 +9,8 @@ import PolygonWallet from "./screens/PolygonWallet";
 import SendBtc from "./screens/SendBtc";
 import { Provider } from "mobx-react";
 import btcStore from "./stores/btcStore";
+import SendMatic from "./screens/SendMatic";
+import Transactions from "./screens/Transactions";
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -48,6 +50,20 @@ export default function App() {
             <Stack.Screen
               name="SendBTC"
               component={SendBtc}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="SendMATIC"
+              component={SendMatic}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Transactions"
+              component={Transactions}
               options={{
                 headerShown: false,
               }}

@@ -2,6 +2,8 @@ import { observable, action } from 'mobx'
 
 class BitcoinStore {
 
+  // for bitcoin
+
   @observable btcAddress = '';
   @observable btcBalance = '';
   @observable connected = false;
@@ -16,6 +18,24 @@ class BitcoinStore {
 
   @action getBalance (balance) {
     this.btcBalance = balance
+  }
+
+  // for polygon
+
+  @observable maticAddress = '';
+  @observable maticBalance = '';
+  @observable maticConnected = false;
+
+  @action setMaticConnected (connected) {
+    this.maticConnected = connected
+  }
+
+  @action getMaticAddress (address) {
+    this.maticAddress = address // update store by re-assigning
+  }
+
+  @action getMaticBalance (balance) {
+    this.maticBalance = balance
   }
 }
 

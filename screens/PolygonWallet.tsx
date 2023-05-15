@@ -12,11 +12,14 @@ import BottomTab from "../components/BottomTab";
 import { getPolygonWalletInfo } from "../helpers/Wallet";
 import btcStore from "../stores/btcStore";
 import Loader from "../components/Loader";
+import { useNavigation } from "@react-navigation/native";
 
 const PolygonWalletScreen: React.FC = () => {
   const [connected, setConnected] = useState(false); // Whether a wallet is connected or not
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [address, setAddress] = useState(""); // The Polygon wallet address
+
+  const navigation = useNavigation();
 
   const divider = 10 ** 19; // 1 MATIC = 1000000000000000000000000000000 Wei
 
@@ -51,7 +54,7 @@ const PolygonWalletScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Polygon Wallet</Text>
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendMATIC')}>
           <Text style={styles.headerButtonText}>Send USDC</Text>
         </TouchableOpacity>
       </View>

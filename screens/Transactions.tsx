@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert
 } from "react-native";
 import {observer} from "mobx-react-lite";
 import btcStore from "../stores/btcStore";
@@ -63,6 +64,9 @@ const Transactions: React.FC = () => {
   const navigation = useNavigation();
 
   const handleTabPress = (tab: any) => {
+    if(tab === 'USDC'){
+      Alert.alert('Warning', 'USDC transactions still in development mode');
+    }
     setActiveTab(tab);
   };
 

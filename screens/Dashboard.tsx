@@ -61,9 +61,7 @@ const Dashboard: React.FC = () => {
   };
 
   React.useEffect(() => {
-    navigation.addListener("focus", () => {
 		loadDashboard();
-	});
   }, []);
 
   return (

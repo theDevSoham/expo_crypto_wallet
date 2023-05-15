@@ -32,11 +32,13 @@ const BitcoinWalletScreen: React.FC = () => {
 	setLoader(true);
 	getBitcoinWalletInfo(address)
 	.then((walletInfo) => {
+    console.log(walletInfo);
 		setLoader(false);
 		console.log(walletInfo);
 		btcStore.getAddress(walletInfo.address);
 		btcStore.getBalance((walletInfo.balance/ divider).toString());
 		btcStore.setConnected(true);
+    btcStore.getTx(walletInfo.txrefs);
 		setConnected(true);
 	})
 	.catch((error) => {

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import {observer} from "mobx-react-lite";
+import btcStore from "../stores/btcStore";
 
 const BTC_TRANSACTIONS = [
   {
@@ -66,6 +68,17 @@ const Transactions: React.FC = () => {
 
   const renderTransactionItem = ({ item }: any) => (
     <View style={styles.transactionItem}>
+      <Text style={styles.transactionType}>{item.tx_hash.substring(0, 16) + "..."}</Text>
+      <View style={styles.transactionBody}>
+		<Text style={styles.transactionDate}>{item.confirmed}</Text>
+		<Text style={styles.transactionAmount}>{item.value}</Text>
+	  </View>
+      <Text style={styles.transactionStatus}>Spent: {item.spent? 'yes' : 'no'}</Text>
+    </View>
+  );
+
+  const renderUSDCTransactionItem = ({ item }: any) => (
+    <View style={styles.transactionItem}>
       <Text style={styles.transactionType}>{item.type}</Text>
       <View style={styles.transactionBody}>
 		<Text style={styles.transactionDate}>{item.date}</Text>
@@ -109,15 +122,15 @@ const Transactions: React.FC = () => {
 
       {/* Transaction List */}
       {activeTab === "BTC" ? (
-        <FlatList
-          data={BTC_TRANSACTIONS}
+        btcStore.btcTx.length > 0 ? <FlatList
+          data={btcStore.btcTx}
           renderItem={renderTransactionItem}
-          keyExtractor={(item) => item.id}
-        />
+          keyExtractor={(item) => item.tx_hash}
+        /> : <Text>No transactions yet</Text>
       ) : (
         <FlatList
           data={USDC_TRANSACTIONS}
-          renderItem={renderTransactionItem}
+          renderItem={renderUSDCTransactionItem}
           keyExtractor={(item) => item.id}
         />
       )}
@@ -204,4 +217,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Transactions;
+export default observer(Transactions);

@@ -1,16 +1,38 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { send } from "../helpers/Send";
+import Loader from "../components/Loader";
 
 export default function SendPolygonTransaction() {
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
+  const [loader, setLoader] = useState(false);
   const navigation = useNavigation();
 
   const handleSendTransaction = async () => {
+    if (toAddress.length === 0 || amount.length === 0)
+      return alert("Please fill in all fields");
     try {
+      setLoader(true);
       // Success message
-      alert(`Functionality still in dev mode`);
+      send(toAddress, parseFloat(amount))
+        .then((hash) => {
+          setLoader(false);
+          alert(`Transaction sent: ${hash}`);
+        })
+        .catch((error) => {
+          setLoader(false);
+          console.log(error);
+          alert(`Error sending transaction: ${error}`);
+        });
+      //alert(`Functionality still in dev mode`);
       // Reset input fields
       setToAddress("");
       setAmount("");
@@ -43,9 +65,13 @@ export default function SendPolygonTransaction() {
       <TouchableOpacity style={styles.button} onPress={handleSendTransaction}>
         <Text style={styles.buttonText}>Send Transaction</Text>
       </TouchableOpacity>
-	  <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.goBack()}
+      >
         <Text style={styles.buttonText}>Go Back</Text>
       </TouchableOpacity>
+      {loader && <Loader />}
     </View>
   );
 }
@@ -72,14 +98,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 10,
     padding: 10,
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

@@ -76,9 +76,9 @@ const PolygonWalletScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Polygon Wallet</Text>
-        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendMATIC')}>
-          <Text style={styles.headerButtonText}>Send USDC</Text>
-        </TouchableOpacity>
+        {connected && <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendMATIC')}>
+          <Text style={styles.headerButtonText}>Send MATIC</Text>
+        </TouchableOpacity>}
       </View>
 
       {/* Body */}

@@ -6,34 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Alert
+  Alert,
 } from "react-native";
-import {observer} from "mobx-react-lite";
+import { observer } from "mobx-react-lite";
 import btcStore from "../stores/btcStore";
-
-const BTC_TRANSACTIONS = [
-  {
-    id: "1",
-    type: "Received",
-    date: "May 10, 2023",
-    amount: "0.12345 BTC",
-    status: "Completed",
-  },
-  {
-    id: "2",
-    type: "Sent",
-    date: "May 8, 2023",
-    amount: "0.042 BTC",
-    status: "Completed",
-  },
-  {
-    id: "3",
-    type: "Received",
-    date: "May 6, 2023",
-    amount: "0.98765 BTC",
-    status: "Completed",
-  },
-];
+import { getBitcoinTrxnOnly, getPolygonTrxnOnly } from "../helpers/Wallet";
 
 const USDC_TRANSACTIONS = [
   {
@@ -62,42 +39,79 @@ const USDC_TRANSACTIONS = [
 const Transactions: React.FC = () => {
   const [activeTab, setActiveTab] = useState("BTC");
   const navigation = useNavigation();
+  const [btcTx, setBtcTx] = useState<any[]>([]);
+  const [maticTrx, setMaticTrx] = useState<any[]>([]);
 
   const handleTabPress = (tab: any) => {
-    if(tab === 'USDC'){
-      Alert.alert('Warning', 'USDC transactions still in development mode');
+    if(btcStore.maticAddress.length > 0 && tab === 'USDC'){
+      getPolygonTrxnOnly(btcStore.maticAddress)
+      .then(({transaction}) => {
+        setMaticTrx(transaction.result);
+        btcStore.getMaticTx(transaction.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+
+    if(btcStore.btcAddress.length > 0 && tab === 'BTC'){
+      getBitcoinTrxnOnly(btcStore.btcAddress).then((tx) => {
+        setBtcTx(tx);
+        btcStore.getTx(tx);
+      });
     }
     setActiveTab(tab);
   };
 
   const renderTransactionItem = ({ item }: any) => (
     <View style={styles.transactionItem}>
-      <Text style={styles.transactionType}>{item.tx_hash.substring(0, 16) + "..."}</Text>
+      <Text style={styles.transactionType}>
+        {item.tx_hash.substring(0, 16) + "..."}
+      </Text>
       <View style={styles.transactionBody}>
-		<Text style={styles.transactionDate}>{item.confirmed}</Text>
-		<Text style={styles.transactionAmount}>{item.value}</Text>
-	  </View>
-      <Text style={styles.transactionStatus}>Spent: {item.spent? 'yes' : 'no'}</Text>
+        <Text style={styles.transactionDate}>{item.confirmed}</Text>
+        <Text style={styles.transactionAmount}>{item.value}</Text>
+      </View>
+      <Text style={styles.transactionStatus}>
+        Spent: {item.spent ? "yes" : "no"}
+      </Text>
     </View>
   );
 
   const renderUSDCTransactionItem = ({ item }: any) => (
     <View style={styles.transactionItem}>
-      <Text style={styles.transactionType}>{item.type}</Text>
+      <Text style={styles.transactionType}>{item.blockHash.substring(0, 16) + '...'}</Text>
       <View style={styles.transactionBody}>
-		<Text style={styles.transactionDate}>{item.date}</Text>
-		<Text style={styles.transactionAmount}>{item.amount}</Text>
-	  </View>
-      <Text style={styles.transactionStatus}>{item.status}</Text>
+        <Text style={styles.transactionDate}>{item.timeStamp}</Text>
+        <Text style={styles.transactionAmount}>Value: {item.value.toString().substring(0, 16) + '...'}</Text>
+      </View>
+      <Text style={styles.transactionStatus}>{item.txreceipt_status === "1" ? "Success" : "Failed"}</Text>
     </View>
   );
+
+  React.useEffect(() => {
+    if(!btcStore.maticConnected && !btcStore.connected){
+      Alert.alert("Error", "Please connect a wallet first");
+      navigation.navigate("Dashboard");
+    }
+
+    if(btcStore.btcAddress.length > 0){
+      getBitcoinTrxnOnly(btcStore.btcAddress).then((tx) => {
+        setBtcTx(tx);
+        btcStore.getTx(tx);
+      });
+    }
+  }, [])
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Transaction History</Text>
-        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('Dashboard')}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => navigation.navigate("Dashboard")}
+        >
           <Text style={styles.headerButtonText}>Home</Text>
         </TouchableOpacity>
       </View>
@@ -126,17 +140,23 @@ const Transactions: React.FC = () => {
 
       {/* Transaction List */}
       {activeTab === "BTC" ? (
-        btcStore.btcTx.length > 0 ? <FlatList
-          data={btcStore.btcTx}
-          renderItem={renderTransactionItem}
-          keyExtractor={(item) => item.tx_hash}
-        /> : <Text>No transactions yet</Text>
-      ) : (
+        btcStore.btcTx.length > 0 ? (
+          <FlatList
+            data={btcStore.btcTx}
+            renderItem={renderTransactionItem}
+            keyExtractor={(item) => item.tx_hash}
+          />
+        ) : (
+          <Text>No transactions yet</Text>
+        )
+      ) : maticTrx.length > 0 ? (
         <FlatList
-          data={USDC_TRANSACTIONS}
+          data={btcStore.maticTx}
           renderItem={renderUSDCTransactionItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.blockHash}
         />
+      ) : (
+        <Text>No transactions yet</Text>
       )}
     </View>
   );
@@ -203,18 +223,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   transactionBody: {
-	flexDirection: "row",
-	alignItems: "center",
-	justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   transactionDate: {
     color: "#666",
-	marginRight: 10,
+    marginRight: 10,
   },
   transactionAmount: {
     fontWeight: "bold",
     fontSize: 16,
-	marginLeft: 10,
+    marginLeft: 10,
   },
   transactionStatus: {
     color: "#666",

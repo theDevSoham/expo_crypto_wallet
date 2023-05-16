@@ -13,11 +13,14 @@ import { getPolygonWalletInfo } from "../helpers/Wallet";
 import btcStore from "../stores/btcStore";
 import Loader from "../components/Loader";
 import { useNavigation } from "@react-navigation/native";
+import { getMaticToUSDT } from "../helpers/Markets";
 
 const PolygonWalletScreen: React.FC = () => {
   const [connected, setConnected] = useState(false); // Whether a wallet is connected or not
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [address, setAddress] = useState(""); // The Polygon wallet address
+  const [isMatic, setIsMatic] = useState<boolean>(true); // Whether the wallet is matic or usdt or not
+  const [usdtEq, setUsdtEq] = useState<string>(""); // Equivalent usdt value of the wallet
 
   const navigation = useNavigation();
 
@@ -30,19 +33,38 @@ const PolygonWalletScreen: React.FC = () => {
 	};
 	setLoader(true);
 	getPolygonWalletInfo(address)
-	.then((walletInfo) => {
+	.then(({walletInfo, transaction}) => {
 		setLoader(false);
-		console.log(walletInfo);
+		console.log(transaction);
 		btcStore.getMaticAddress(address);
-		btcStore.getMaticBalance((walletInfo.result/divider).toString());
+		btcStore.getMaticBalance((walletInfo.result/divider).toFixed(3).toString());
 		btcStore.setMaticConnected(true);
 		setConnected(true);
+    btcStore.getMaticTx(transaction.result);
 	})
 	.catch((error) => {
 		setLoader(false);
 		Alert.alert("Error", "Invalid Address");
 		console.log(error);
 	});
+  };
+
+  const convertToUSDT = React.useCallback((): void => {
+    setLoader(true);
+    getMaticToUSDT().then((price) => {
+      setLoader(false);
+      setIsMatic(false);
+      setUsdtEq((price * parseFloat(btcStore.maticBalance)).toFixed(3).toString());
+    }).catch((err) => {
+      setLoader(false);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.log(err);
+    });
+  }, []);
+
+  const convertToMatic = (): void => {
+    setIsMatic(true);
+    setUsdtEq('');
   };
 
   React.useEffect(() => {
@@ -65,8 +87,16 @@ const PolygonWalletScreen: React.FC = () => {
           <>
             <Text style={styles.addressLabel}>Connected to:</Text>
             <Text style={styles.addressValue}>{btcStore.maticAddress}</Text>
-            <Text style={styles.balanceLabel}>Available MATIC</Text>
-            <Text style={styles.balanceValue}>{btcStore.maticBalance} MATIC</Text>
+            <Text style={styles.balanceLabel}>Available {isMatic ? 'MATIC' : 'USDT'}</Text>
+            <Text style={styles.balanceValue}>{isMatic? btcStore.maticBalance + 'MATIC' : usdtEq + 'USDT'} </Text>
+            {isMatic ? <TouchableOpacity style={styles.button} onPress={convertToUSDT}>
+              <Text style={styles.buttonText}>Convert to USDT</Text>
+            </TouchableOpacity>
+            :
+            <TouchableOpacity style={styles.button} onPress={convertToMatic}>
+            <Text style={styles.buttonText}>Convert to USDT</Text>
+          </TouchableOpacity>
+            }
           </>
         ) : (
           <>
@@ -174,6 +204,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "#ccc",
+  },
+  button: {
+    backgroundColor: "#0066CC",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

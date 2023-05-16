@@ -75,7 +75,7 @@ export async function signTransaction(privateKey: string, transactionData: Recor
 
 	console.log('signature', signature.data);
   
-	const signatureString = signature.toString(); // Convert signature to string
+	const signatureString = signature.data.toString(); // Convert signature to string
   
 	const v = `0x${signatureString.slice(130, 132)}`;
 	const r = `0x${signatureString.slice(2, 66)}`;

@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native";
+import { sendTransaction } from "../helpers/Transaction";
 
 export default function SendPolygonTransaction() {
   const [toAddress, setToAddress] = useState("");
@@ -10,6 +11,7 @@ export default function SendPolygonTransaction() {
   const handleSendTransaction = async () => {
     try {
       // Success message
+      sendTransaction();
       alert(`Functionality still in dev mode`);
       // Reset input fields
       setToAddress("");

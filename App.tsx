@@ -1,4 +1,4 @@
-import { StatusBar } from "expo-status-bar";
+import './shim';
 import { StyleSheet, Text, View } from "react-native";
 import SplashScreen from "./screens/SplashScreen";
 import { NavigationContainer } from "@react-navigation/native";

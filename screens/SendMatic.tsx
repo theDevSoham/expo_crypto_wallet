@@ -1,11 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native";
-
-import ethers from "ethers";
-
-const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com/v1/e541384afcd3bb9551d2fa936e3e456c801b196e');
-console.log(provider);
+import { sendTransaction } from './../helpers/Transaction';
 
 export default function SendPolygonTransaction() {
   const [toAddress, setToAddress] = useState("");
@@ -15,6 +11,7 @@ export default function SendPolygonTransaction() {
   const handleSendTransaction = async () => {
     try {
       // Success message
+      sendTransaction();
       alert(`Functionality still in dev mode`);
       // Reset input fields
       setToAddress("");

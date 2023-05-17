@@ -17,8 +17,7 @@ export const getPolygonWalletInfo = async (address: string): Promise<any> => {
 	const url = `${polygon_base_url}&address=${address}&apikey=${polygon_api_key}`
 	const trxn_url = `${polygon_trxn_history}${address}`;
 	const response: AxiosResponse = await axios.get(url);
-	const trxn_response: AxiosResponse = await axios.get(trxn_url);
-	return await {walletInfo: response.data, transaction: trxn_response.data};
+	return await {walletInfo: response.data};
 };
 
 export const getPolygonTrxnOnly = async (address: string): Promise<any> => {

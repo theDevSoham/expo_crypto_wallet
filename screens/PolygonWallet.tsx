@@ -33,14 +33,12 @@ const PolygonWalletScreen: React.FC = () => {
 	};
 	setLoader(true);
 	getPolygonWalletInfo(address)
-	.then(({walletInfo, transaction}) => {
+	.then(({walletInfo}) => {
 		setLoader(false);
-		console.log(transaction);
 		btcStore.getMaticAddress(address);
 		btcStore.getMaticBalance((walletInfo.result/divider).toFixed(3).toString());
 		btcStore.setMaticConnected(true);
 		setConnected(true);
-    btcStore.getMaticTx(transaction.result);
 	})
 	.catch((error) => {
 		setLoader(false);

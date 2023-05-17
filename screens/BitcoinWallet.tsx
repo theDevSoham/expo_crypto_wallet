@@ -57,9 +57,9 @@ const BitcoinWalletScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Bitcoin Wallet</Text>
-        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendBTC')}>
+        {btcStore.connected && <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendBTC')}>
           <Text style={styles.headerButtonText}>Send BTC</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
 
       {/* Body */}

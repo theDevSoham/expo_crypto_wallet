@@ -11,8 +11,11 @@ export default function SendBitcoinTransaction() {
   const handleSendTransaction = async () => {
     try {
       // Success message
-      sendBitcoin();
-      alert(`Functionality still in dev mode`);
+      sendBitcoin().then((res) => {
+        alert("Send transaction: " + res);
+      }).catch((err) => {
+        alert("Error sending transaction: " + err);
+      });
       // Reset input fields
       setToAddress("");
       setAmount("");

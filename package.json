@@ -12,6 +12,7 @@
     "@ethersproject/shims": "^5.7.0",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
+    "assert": "^2.0.0",
     "axios": "^1.4.0",
     "ethers": "^5.4.7",
     "expo": "~48.0.15",

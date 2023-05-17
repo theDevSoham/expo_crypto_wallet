@@ -46,8 +46,9 @@ const Transactions: React.FC = () => {
     if(btcStore.maticAddress.length > 0 && tab === 'USDC'){
       getPolygonTrxnOnly(btcStore.maticAddress)
       .then(({transaction}) => {
-        setMaticTrx(transaction.result);
-        btcStore.getMaticTx(transaction.result);
+        console.log(transaction);
+        setMaticTrx(transaction.result || []);
+        btcStore.getMaticTx(transaction.result || []);
       })
       .catch((err) => {
         console.log(err);
@@ -101,7 +102,11 @@ const Transactions: React.FC = () => {
         btcStore.getTx(tx);
       });
     }
-  }, [])
+  }, []);
+
+  React.useEffect(() => {
+    console.log("matic: ", maticTrx);
+  }, [maticTrx]);
 
   return (
     <View style={styles.container}>
@@ -140,9 +145,9 @@ const Transactions: React.FC = () => {
 
       {/* Transaction List */}
       {activeTab === "BTC" ? (
-        btcStore.btcTx.length > 0 ? (
+        btcTx.length > 0 ? (
           <FlatList
-            data={btcStore.btcTx}
+            data={btcTx}
             renderItem={renderTransactionItem}
             keyExtractor={(item) => item.tx_hash}
           />
@@ -151,7 +156,7 @@ const Transactions: React.FC = () => {
         )
       ) : maticTrx.length > 0 ? (
         <FlatList
-          data={btcStore.maticTx}
+          data={maticTrx}
           renderItem={renderUSDCTransactionItem}
           keyExtractor={(item) => item.blockHash}
         />

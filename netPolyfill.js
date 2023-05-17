@@ -1,10 +1,3 @@
-import { Socket, connect } from 'react-native-tcp';
-
-global.net = {
-  Socket,
-  connect,
-};
-
 if (!global.btoa) {
 	global.btoa = function (input) {
 	  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';

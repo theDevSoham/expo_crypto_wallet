@@ -5,8 +5,8 @@ class BitcoinStore {
   // for bitcoin
 
   @observable btcAddress = '';
+  @observable btcPrivateKey = '';
   @observable btcBalance = '';
-  @observable btcTx = [];
   @observable connected = false;
 
   @action setConnected (connected) {
@@ -21,16 +21,16 @@ class BitcoinStore {
     this.btcBalance = balance
   }
 
-  @action getTx (tx) {
-    this.btcTx = tx
+  @action getPrivateKey (privateKey) {
+    this.btcPrivateKey = privateKey
   }
 
   // for polygon
 
   @observable maticAddress = '';
+  @observable maticPrivateKey = '';
   @observable maticBalance = '';
   @observable maticConnected = false;
-  @observable maticTx = [];
 
   @action setMaticConnected (connected) {
     this.maticConnected = connected
@@ -44,8 +44,8 @@ class BitcoinStore {
     this.maticBalance = balance
   }
 
-  @action getMaticTx (tx) {
-    this.maticTx = tx
+  @action getMaticPrivateKey (privateKey) {
+    this.maticPrivateKey = privateKey
   }
 }
 

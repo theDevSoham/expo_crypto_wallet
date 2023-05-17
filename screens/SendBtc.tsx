@@ -2,24 +2,33 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native";
 import { sendBitcoin } from "../helpers/BTCSend";
+import { observer } from "mobx-react";
+import btcStore from "../stores/btcStore";
+import Loader from '../components/BottomTab';
 
-export default function SendBitcoinTransaction() {
+const SendBitcoinTransaction = () => {
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
+  const [loader, setLoader] = useState(false);
   const navigation = useNavigation();
 
   const handleSendTransaction = async () => {
+    if(toAddress.length === 0 || amount.length === 0) return alert("Please fill in all fields");
     try {
       // Success message
-      sendBitcoin().then((res) => {
+      setLoader(true);
+      sendBitcoin(btcStore.btcAddress, toAddress, btcStore.btcPrivateKey, Number(amount)).then((res) => {
+        setLoader(false);
         alert("Send transaction: " + res);
       }).catch((err) => {
+        setLoader(false);
         alert("Error sending transaction: " + err);
       });
       // Reset input fields
       setToAddress("");
       setAmount("");
     } catch (error: any) {
+      setLoader(false);
       // Error message
       alert(`Error sending transaction: ${error}`);
     }
@@ -51,9 +60,12 @@ export default function SendBitcoinTransaction() {
       <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Go Back</Text>
       </TouchableOpacity>
+      {loader && <Loader />}
     </View>
   );
 }
+
+export default observer(SendBitcoinTransaction);
 
 const styles = StyleSheet.create({
   container: {

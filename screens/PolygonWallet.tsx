@@ -19,6 +19,7 @@ const PolygonWalletScreen: React.FC = () => {
   const [connected, setConnected] = useState(false); // Whether a wallet is connected or not
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [address, setAddress] = useState(""); // The Polygon wallet address
+  const [key, setKey] = useState(""); // The Polygon key
   const [isMatic, setIsMatic] = useState<boolean>(true); // Whether the wallet is matic or usdt or not
   const [usdtEq, setUsdtEq] = useState<string>(""); // Equivalent usdt value of the wallet
 
@@ -27,8 +28,8 @@ const PolygonWalletScreen: React.FC = () => {
   const divider = 10 ** 19; // 1 MATIC = 1000000000000000000000000000000 Wei
 
   const connectWallet = () => {
-	if(address.length === 0){
-		Alert.alert("Error", "Address cannot be empty");
+	if(address.length === 0 || key.length === 0){
+		Alert.alert("Error", "Address or key cannot be empty");
 		return;
 	};
 	setLoader(true);
@@ -38,6 +39,7 @@ const PolygonWalletScreen: React.FC = () => {
 		btcStore.getMaticAddress(address);
 		btcStore.getMaticBalance((walletInfo.result/divider).toFixed(3).toString());
 		btcStore.setMaticConnected(true);
+    btcStore.getMaticPrivateKey(key);
 		setConnected(true);
 	})
 	.catch((error) => {
@@ -103,6 +105,12 @@ const PolygonWalletScreen: React.FC = () => {
               placeholder="Enter Polygon Address"
               onChangeText={(text) => setAddress(text)}
               value={address}
+            />
+            <TextInput
+              style={styles.addressInput}
+              placeholder="Enter Polygon Key"
+              onChangeText={(text) => setKey(text)}
+              value={key}
             />
             <TouchableOpacity
               style={styles.connectButton}

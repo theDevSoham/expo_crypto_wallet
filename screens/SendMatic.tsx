@@ -9,8 +9,10 @@ import {
 } from "react-native";
 import { send } from "../helpers/Send";
 import Loader from "../components/Loader";
+import { observer } from "mobx-react";
+import btcStore from "../stores/btcStore";
 
-export default function SendPolygonTransaction() {
+const SendPolygonTransaction = () => {
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [loader, setLoader] = useState(false);
@@ -22,7 +24,7 @@ export default function SendPolygonTransaction() {
     try {
       setLoader(true);
       // Success message
-      send(toAddress, parseFloat(amount))
+      send(toAddress, parseFloat(amount), btcStore.maticPrivateKey)
         .then((hash) => {
           setLoader(false);
           alert(`Transaction sent: ${hash}`);
@@ -75,6 +77,8 @@ export default function SendPolygonTransaction() {
     </View>
   );
 }
+
+export default observer(SendPolygonTransaction);
 
 const styles = StyleSheet.create({
   container: {

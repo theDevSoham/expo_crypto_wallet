@@ -19,6 +19,9 @@ const divider = 100000000; // 1 BTC = 100000000 Satoshi
 const BitcoinWalletScreen: React.FC = () => {
 
   const [address, setAddress] = useState<string>(""); // The bitcoin wallet address
+
+  const [key, setKey] = useState<string>(""); // The bitcoin key
+
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [connected, setConnected] = useState<boolean>(false); // The connected state
 
@@ -38,7 +41,7 @@ const BitcoinWalletScreen: React.FC = () => {
 		btcStore.getAddress(walletInfo.address);
 		btcStore.getBalance((walletInfo.balance/ divider).toString());
 		btcStore.setConnected(true);
-    btcStore.getTx(walletInfo.txrefs);
+    btcStore.getPrivateKey(key);
 		setConnected(true);
 	})
 	.catch((error) => {
@@ -78,6 +81,12 @@ const BitcoinWalletScreen: React.FC = () => {
               placeholder="Enter Bitcoin Address"
               onChangeText={(text) => setAddress(text)}
               value={address}
+            />
+            <TextInput
+              style={styles.addressInput}
+              placeholder="Enter Bitcoin Key"
+              onChangeText={(text) => setKey(text)}
+              value={key}
             />
             <TouchableOpacity
               style={styles.connectButton}

@@ -99,7 +99,7 @@ const BitcoinWalletScreen: React.FC = () => {
             <Text style={styles.addressLabel}>Connected to:</Text>
             <Text style={styles.addressValue}>{btcStore.btcAddress}</Text>
             <Text style={styles.balanceLabel}>Available Bitcoins</Text>
-            <Text style={styles.balanceValue}>{balance} BTC</Text>
+            <Text style={styles.balanceValue}>{balance} Satoshi</Text>
           </>
         ) : (
           <>

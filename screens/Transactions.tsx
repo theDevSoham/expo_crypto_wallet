@@ -35,21 +35,23 @@ const TransactionsScreen: React.FC = () => {
   React.useEffect(() => {
     if(btcStore.btcAddress.length > 0){
       getBitcoinTrxnOnly(btcStore.btcAddress).then(trxn => {
-        console.log("btcTrx: ", trxn[0]);
-        setBtcTrx(prev => {
-          if(prev.length === trxn.length){
-            return prev;
-          } else {
-            const newObj = [
-              ...prev,
-              {
-                id: trxn[0].tx_hash,
-                amount: trxn[0].value,
-                hex: trxn[0].tx_hash,
-              },
-            ];
-            return [...new Set(newObj)];
-          }
+        console.log("btcTrx: ", trxn);
+        trxn.forEach((element: any) => {
+          setBtcTrx((prev) => {
+            if(prev.length === trxn.length){
+              return prev;
+            } else {
+              const newObj = [
+                ...prev,
+                {
+                  id: element.tx_hash,
+                  amount: element.value,
+                  hex: element.tx_hash,
+                },
+              ];
+              return [...new Set(newObj)];
+            }
+          });
         });
       })
     }

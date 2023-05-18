@@ -9,17 +9,15 @@ import {
 } from "react-native";
 import BottomTab from "../components/BottomTab";
 import { useNavigation } from "@react-navigation/native";
-import { observer } from 'mobx-react-lite';
+import { observer } from "mobx-react-lite";
 import btcStore from "../stores/btcStore";
 import { getBitcoinWalletInfo } from "../helpers/Wallet";
 import Loader from "../components/Loader";
+import { getAddrFromPvtKey } from "../helpers/BTCSend";
 
 const divider = 100000000; // 1 BTC = 100000000 Satoshi
 
 const BitcoinWalletScreen: React.FC = () => {
-
-  const [address, setAddress] = useState<string>(""); // The bitcoin wallet address
-
   const [key, setKey] = useState<string>(""); // The bitcoin key
 
   const [loader, setLoader] = useState<boolean>(false); // The loader state
@@ -28,31 +26,33 @@ const BitcoinWalletScreen: React.FC = () => {
   const navigation = useNavigation();
 
   const connectWallet = () => {
-	if(address.length === 0){
-		Alert.alert("Error", "Address cannot be empty");
-		return;
-	}
-	setLoader(true);
-	getBitcoinWalletInfo(address)
-	.then((walletInfo) => {
-    console.log(walletInfo);
-		setLoader(false);
-		console.log(walletInfo);
-		btcStore.getAddress(walletInfo.address);
-		btcStore.getBalance((walletInfo.balance/ divider).toString());
-		btcStore.setConnected(true);
-    btcStore.getPrivateKey(key);
-		setConnected(true);
-	})
-	.catch((error) => {
-		setLoader(false);
-		Alert.alert("Error", "Invalid Address");
-		console.log(error);
-	});
+    if (key.length === 0) {
+      Alert.alert("Error", "Address or key cannot be empty");
+      return;
+    }
+    console.log("Address: ", getAddrFromPvtKey(key));
+    
+    setLoader(true);
+    getBitcoinWalletInfo(getAddrFromPvtKey(key))
+      .then((walletInfo) => {
+        console.log(walletInfo);
+        setLoader(false);
+        console.log(walletInfo);
+        btcStore.getAddress(walletInfo.address);
+        btcStore.getBalance((walletInfo.balance).toString());
+        btcStore.setConnected(true);
+        btcStore.getPrivateKey(key);
+        setConnected(true);
+      })
+      .catch((error) => {
+        setLoader(false);
+        Alert.alert("Error", "Invalid Address");
+        console.log(error);
+      });
   };
 
   React.useEffect(() => {
-	setConnected(btcStore.connected);
+    setConnected(btcStore.connected);
   }, [btcStore.connected]);
 
   return (
@@ -60,9 +60,14 @@ const BitcoinWalletScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Bitcoin Wallet</Text>
-        {btcStore.connected && <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('SendBTC')}>
-          <Text style={styles.headerButtonText}>Send BTC</Text>
-        </TouchableOpacity>}
+        {btcStore.connected && (
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.navigate("SendBTC")}
+          >
+            <Text style={styles.headerButtonText}>Send BTC</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Body */}
@@ -76,12 +81,6 @@ const BitcoinWalletScreen: React.FC = () => {
           </>
         ) : (
           <>
-            <TextInput
-              style={styles.addressInput}
-              placeholder="Enter Bitcoin Address"
-              onChangeText={(text) => setAddress(text)}
-              value={address}
-            />
             <TextInput
               style={styles.addressInput}
               placeholder="Enter Bitcoin Key"
@@ -102,7 +101,7 @@ const BitcoinWalletScreen: React.FC = () => {
       <View style={styles.footer}>
         <BottomTab />
       </View>
-	  {loader ? <Loader /> : null}
+      {loader ? <Loader /> : null}
     </View>
   );
 };

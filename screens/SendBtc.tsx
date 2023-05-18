@@ -4,7 +4,7 @@ import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-nativ
 import { sendBitcoin } from "../helpers/BTCSend";
 import { observer } from "mobx-react";
 import btcStore from "../stores/btcStore";
-import Loader from '../components/BottomTab';
+import Loader from '../components/Loader';
 
 const SendBitcoinTransaction = () => {
   const [toAddress, setToAddress] = useState("");

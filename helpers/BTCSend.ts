@@ -36,12 +36,12 @@ let walletB = {
   privateKey: "cTXUuJbnj4MhMercd5qcNpMaYM6PGJHsv27LC5XwtHCwSU7hr992",
 };
 
-const senderAddress = walletA.addr;
-const receiverAddress = walletB.addr;
-const pvtKey = walletA.privateKey;
-const amount = 0.000001; // Bitcoin amount to send
-
-export async function sendBitcoin() {
+export async function sendBitcoin(senderAddr: string, receiverAddr: string, privateKey: string, amt: number): Promise<any>{
+  const senderAddress = senderAddr;
+  const receiverAddress = receiverAddr;
+  const pvtKey = privateKey;
+  const amount = amt; // Bitcoin amount to send
+  
   try {
     // Fetch unspent transaction outputs (UTXOs) for the sender address
     const response = await axios.get(
@@ -85,7 +85,17 @@ export async function sendBitcoin() {
       transactionId
     );
     return transactionId as string;
-  } catch (error) {
-    console.error("Error sending transaction:", error);
+  } catch (error: any) {
+    console.error("Error sending transaction:", error.message);
+    return error.message as string;
   }
 }
+
+export const getAddrFromPvtKey = (pvtKey: string): string => {
+  const keyPair = bitcoin.ECPair.fromWIF(pvtKey, bitcoin.networks.testnet);
+  const { address } = bitcoin.payments.p2pkh({
+    pubkey: keyPair.publicKey,
+    network: bitcoin.networks.testnet,
+  });
+  return address as string;
+};

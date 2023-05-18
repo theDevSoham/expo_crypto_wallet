@@ -21,3 +21,10 @@ export const send = async (recepient: string, amt: number, pvtKey: string) => {
   const signedTx = await wallet.sendTransaction(tx);
   return signedTx.hash;
 };
+
+export const getWalletFromPrivateKey = (encryptedPrivateKey: string): string => {
+  const wallet = new ethers.Wallet(encryptedPrivateKey);
+  const address = wallet.address;
+
+  return address as string;
+}

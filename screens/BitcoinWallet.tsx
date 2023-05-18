@@ -22,6 +22,7 @@ const BitcoinWalletScreen: React.FC = () => {
 
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [connected, setConnected] = useState<boolean>(false); // The connected state
+  const [balance, setBalance] = useState<string>(''); // The
 
   const navigation = useNavigation();
 
@@ -31,7 +32,7 @@ const BitcoinWalletScreen: React.FC = () => {
       return;
     }
     console.log("Address: ", getAddrFromPvtKey(key));
-    
+
     setLoader(true);
     getBitcoinWalletInfo(getAddrFromPvtKey(key))
       .then((walletInfo) => {
@@ -39,10 +40,11 @@ const BitcoinWalletScreen: React.FC = () => {
         setLoader(false);
         console.log(walletInfo);
         btcStore.getAddress(walletInfo.address);
-        btcStore.getBalance((walletInfo.balance).toString());
+        btcStore.getBalance(walletInfo.balance.toString());
         btcStore.setConnected(true);
         btcStore.getPrivateKey(key);
         setConnected(true);
+        setBalance(walletInfo.balance.toString());
       })
       .catch((error) => {
         setLoader(false);
@@ -53,6 +55,26 @@ const BitcoinWalletScreen: React.FC = () => {
 
   React.useEffect(() => {
     setConnected(btcStore.connected);
+    if (btcStore.connected) {
+      setLoader(true);
+      getBitcoinWalletInfo(getAddrFromPvtKey(btcStore.btcPrivateKey))
+        .then((walletInfo) => {
+          console.log(walletInfo);
+          setLoader(false);
+          console.log(walletInfo);
+          btcStore.getAddress(walletInfo.address);
+          btcStore.getBalance(walletInfo.balance.toString());
+          btcStore.setConnected(true);
+          btcStore.getPrivateKey(key);
+          setConnected(true);
+          setBalance(walletInfo.balance.toString());
+        })
+        .catch((error) => {
+          setLoader(false);
+          Alert.alert("Error", "Invalid Address");
+          console.log(error);
+        });
+    }
   }, [btcStore.connected]);
 
   return (
@@ -77,7 +99,7 @@ const BitcoinWalletScreen: React.FC = () => {
             <Text style={styles.addressLabel}>Connected to:</Text>
             <Text style={styles.addressValue}>{btcStore.btcAddress}</Text>
             <Text style={styles.balanceLabel}>Available Bitcoins</Text>
-            <Text style={styles.balanceValue}>{btcStore.btcBalance} BTC</Text>
+            <Text style={styles.balanceValue}>{balance} BTC</Text>
           </>
         ) : (
           <>

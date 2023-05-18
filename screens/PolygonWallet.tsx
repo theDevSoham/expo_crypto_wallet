@@ -21,6 +21,7 @@ const PolygonWalletScreen: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false); // The loader state
   const [key, setKey] = useState(""); // The Polygon wallet address
   const [isMatic, setIsMatic] = useState<boolean>(true); // Whether the wallet is matic or usdt or not
+  const [balance, setBalance] = useState<string>(""); // The balance of the wallet
   const [usdtEq, setUsdtEq] = useState<string>(""); // Equivalent usdt value of the wallet
 
   const navigation = useNavigation();
@@ -44,6 +45,7 @@ const PolygonWalletScreen: React.FC = () => {
         btcStore.setMaticConnected(true);
         btcStore.getMaticPrivateKey(key);
         setConnected(true);
+        setBalance((walletInfo.result / divider).toFixed(3).toString());
       })
       .catch((error) => {
         setLoader(false);
@@ -59,7 +61,7 @@ const PolygonWalletScreen: React.FC = () => {
         setLoader(false);
         setIsMatic(false);
         setUsdtEq(
-          (price * parseFloat(btcStore.maticBalance)).toFixed(3).toString()
+          (price * parseFloat(balance)).toFixed(3).toString()
         );
       })
       .catch((err) => {
@@ -76,6 +78,26 @@ const PolygonWalletScreen: React.FC = () => {
 
   React.useEffect(() => {
     setConnected(btcStore.maticConnected);
+    if (btcStore.maticConnected) {
+      setLoader(true);
+      getPolygonWalletInfo(getWalletFromPrivateKey(btcStore.maticPrivateKey))
+        .then(({ walletInfo }) => {
+          setLoader(false);
+          btcStore.getMaticAddress(getWalletFromPrivateKey(btcStore.maticPrivateKey));
+          btcStore.getMaticBalance(
+            (walletInfo.result / divider).toFixed(3).toString()
+          );
+          btcStore.setMaticConnected(true);
+          btcStore.getMaticPrivateKey(btcStore.maticPrivateKey);
+          setConnected(true);
+          setBalance((walletInfo.result / divider).toFixed(3).toString());
+        })
+        .catch((error) => {
+          setLoader(false);
+          Alert.alert("Error", "Invalid Address");
+          console.log(error);
+        });
+    }
   }, [btcStore.maticConnected]);
 
   return (
@@ -103,7 +125,7 @@ const PolygonWalletScreen: React.FC = () => {
               Available {isMatic ? "MATIC" : "USDT"}
             </Text>
             <Text style={styles.balanceValue}>
-              {isMatic ? btcStore.maticBalance + "MATIC" : usdtEq + "USDT"}{" "}
+              {isMatic ? balance + "MATIC" : usdtEq + "USDT"}{" "}
             </Text>
             {isMatic ? (
               <TouchableOpacity style={styles.button} onPress={convertToUSDT}>
